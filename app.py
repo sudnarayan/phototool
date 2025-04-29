@@ -33,7 +33,7 @@ with tabs[0]:
             # Calculate output size in px
             # Example: 210px square (fixed), or use dpi to calculate inches-based
             size_px = 210
-            resized = box.resize((size_px, size_px), Image.ANTIALIAS)
+            resized = box.resize((size_px, size_px), Image.Resampling.LANCZOS)
             st.image(resized, caption=f"Resized Preview ({size_px}×{size_px} px)", use_column_width=False)
             buf = io.BytesIO()
             resized.save(buf, format="JPEG")
