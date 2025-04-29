@@ -11,7 +11,7 @@ st.markdown("""
 Upload and crop your photo to meet BLS Canada requirements (OCI, passport, visa, etc.) in seconds – then download and print yourself to save up to **$8–$10** per session vs in-store services!
 """)
 
-# Prepare Stripe keys and app URL without crashing
+# Load Stripe secrets and app URL
 secret_stripe = st.secrets.get("stripe", {})
 stripe_secret = secret_stripe.get("secret_key")
 stripe_pub = secret_stripe.get("publishable_key")
@@ -19,7 +19,7 @@ app_url = st.secrets.get("app", {}).get("url", "https://blsphoto.streamlit.app/"
 if stripe_secret:
     stripe.api_key = stripe_secret
 
-# Tabs for workflow
+# Workflow tabs
 tabs = st.tabs(["1. Upload & Crop", "2. Resize & Download", "3. Instructions & Print", "4. Payment"])
 
 # --- Tab 1: Upload & Crop ---
@@ -70,12 +70,15 @@ with tabs[2]:
 **You just saved up to $10** vs traditional passport-photo booths.
 """)
 
-# --- Tab 4: Payment ---
+# --- Tab 4: Secure Payment ---
 with tabs[3]:
     st.header("4. Secure Payment")
+    # Show error if Stripe keys are missing
     if not stripe_secret or not stripe_pub:
         st.error("⚠️ Stripe keys not found. Add `stripe.secret_key` and `stripe.publishable_key` to `.streamlit/secrets.toml`.")
-    params = st.experimental_get_query_params()
+
+    # Use new query params API
+    params = st.query_params
     if params.get("success"):
         st.success("🎉 Payment successful! Downloads unlocked.")
         st.session_state.paid = True
@@ -84,32 +87,33 @@ with tabs[3]:
     else:
         st.info("A $1.99 fee unlocks full download functionality. Secure payment via Stripe.")
 
-    if stripe_secret and stripe_pub:
-        if not st.session_state.get("paid"):
-            if st.button("Pay $1.99 USD Now"):
-                try:
-                    session = stripe.checkout.Session.create(
-                        payment_method_types=["card"],
-                        line_items=[{
-                            "price_data": {
-                                "currency": "usd",
-                                "product_data": {"name": "BLS Canada Photo Tool Service Fee"},
-                                "unit_amount": 199
-                            },
-                            "quantity": 1
-                        }],
-                        mode="payment",
-                        success_url=f"{app_url}?success=true",
-                        cancel_url=f"{app_url}?canceled=true"
-                    )
-                    st.markdown(f"👉 [Complete Payment]({session.url})")
-                except Exception as e:
-                    st.error(f"Payment initiation failed: {e}")
-    # Footer
+    # Stripe Checkout flow
+    if stripe_secret and stripe_pub and not st.session_state.get("paid"):
+        if st.button("Pay $1.99 USD Now"):
+            try:
+                session = stripe.checkout.Session.create(
+                    payment_method_types=["card"],
+                    line_items=[{
+                        "price_data": {
+                            "currency": "usd",
+                            "product_data": {"name": "BLS Canada Photo Tool Service Fee"},
+                            "unit_amount": 199
+                        },
+                        "quantity": 1
+                    }],
+                    mode="payment",
+                    success_url=f"{app_url}?success=true",
+                    cancel_url=f"{app_url}?canceled=true"
+                )
+                st.markdown(f"👉 [Complete Payment]({session.url})")
+            except Exception as e:
+                st.error(f"Payment initiation failed: {e}")
+
+    # Footer with guidance
     st.markdown("""
 ---
 *Built for BLS Canada users — DIY and keep your cash!*  
-Set your keys in `.streamlit/secrets.toml`:  
+Set your secrets in `.streamlit/secrets.toml`:  
 ```toml
 [stripe]
 secret_key = "sk_live_..."
