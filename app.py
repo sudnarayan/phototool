@@ -1,5 +1,4 @@
-# Final secure, cloud-safe, payment-enabled, preview-limited `app.py` code
-final_app_code = """
+
 import streamlit as st
 from PIL import Image
 import io
@@ -63,13 +62,3 @@ with st.form("feedback"):
         st.success("Thanks! You're helping improve SnapVisa!")
 
 st.info("💡 Tip: Use a white wall, straight face, and soft lighting for best passport photo results.")
-"""
-
-# Save to file
-import os
-os.makedirs("/mnt/data/final_app", exist_ok=True)
-final_path = "/mnt/data/final_app/app.py"
-with open(final_path, "w") as f:
-    f.write(final_app_code)
-
-final_path
