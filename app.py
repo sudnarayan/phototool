@@ -1,3 +1,5 @@
+import os
+
 # Final `app.py` using st.secrets for Stripe keys and handling paths safely
 app_code = """
 import streamlit as st
