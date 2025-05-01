@@ -19,8 +19,11 @@ if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Photo", use_column_width=True)
 
-    resized_image = image.resize((600, 600))
-    st.image(resized_image, caption="Resized to 600x600 (BLS Canada Spec)")
+   resized_image = image.resize((600, 600))
+
+with st.expander("🔍 Preview resized photo (600x600)", expanded=False):
+    st.image(resized_image, caption="(Optional Preview)", use_container_width=False, output_format="JPEG", clamp=True)
+
 
     # Payment logic
     if not st.session_state.paid:
