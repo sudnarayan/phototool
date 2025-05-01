@@ -1,4 +1,4 @@
 streamlit
 Pillow
 stripe
-streamlit-cropper
+requests
