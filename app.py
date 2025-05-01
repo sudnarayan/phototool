@@ -9,7 +9,19 @@ import requests
 stripe.api_key = st.secrets["STRIPE_SECRET_KEY"]
 
 st.set_page_config(page_title="SnapVisa - BLS Canada Passport Photo")
-st.title("📸 SnapVisa - DIY Passport Photo for BLS Canada")
+st.markdown("<h1 style='text-align: center; color: #0D47A1;'>📷 DIY OCI / Passport Photo Tool</h1><h4 style='text-align: center; color: gray;'>Resize and download photos that meet BLS Canada specs for OCI, Passport, and Visa — no studio needed.</h4>
+
+---
+
+### 📐 Passport Photo Specifications (as per BLS Canada):
+- **Size:** 2 inch x 2 inch (51 mm x 51 mm)
+- **Background:** Plain white without borders
+- **Clothing:** Dark colour top preferred
+- **Eyes:** Open and visible
+
+Below is an official sample reference image from BLS Canada:
+![BLS Spec Image](https://raw.githubusercontent.com/seemulooksgud/phototool/main/static/spec_photo.png)
+", unsafe_allow_html=True)
 
 if "paid" not in st.session_state:
     st.session_state.paid = False
@@ -27,7 +39,8 @@ if uploaded_file:
         st.image(small_preview, caption="(Preview only)", use_container_width=False, output_format="JPEG", clamp=True)
 
     if not st.session_state.paid:
-        st.subheader("Download for $2.99 CAD")
+        st.markdown("### 💳 Secure Download")
+st.markdown("Only $2.99 CAD – pay once and download instantly!")
         if st.button("💳 Pay with Stripe"):
             session = stripe.checkout.Session.create(
                 payment_method_types=["card"],
@@ -49,7 +62,8 @@ if uploaded_file:
         st.session_state.paid = True
 
     if st.session_state.paid:
-        st.success("✅ Payment verified. Ready to download!")
+        st.markdown("### ✅ Payment Verified!")
+st.success("You can now download your resized passport photo below.")
         buf = io.BytesIO()
         resized_image.save(buf, format="JPEG")
         st.download_button("📥 Download Passport Photo", data=buf.getvalue(), file_name="bls_photo.jpg", mime="image/jpeg")
@@ -66,7 +80,7 @@ def send_feedback_to_google_form(name, feedback):
 
 st.markdown("---")
 with st.form("feedback"):
-    st.subheader("💬 Feedback")
+    st.markdown("### 💬 We Value Your Feedback")
     name = st.text_input("Your Name")
     message = st.text_area("What should we improve?")
     if st.form_submit_button("Submit"):
@@ -76,4 +90,29 @@ with st.form("feedback"):
         else:
             st.warning("⚠️ Failed to submit. Try again later.")
 
-st.info("💡 Tip: Use a white wall, straight face, and soft lighting for best passport photo results.")
+
+st.markdown("---")
+st.subheader("🧠 Pro Tips: Save Money on Printing")
+
+st.markdown("""
+**💸 Save $10+ instantly vs photo studios**
+
+Here's how:
+
+- ✅ Download your 600x600 photo after payment
+- 🖨 Upload it to **Walmart Photo Centre** or any online printer (e.g. Staples, Costco)
+- 📏 Choose "2x2 inch" passport photo layout
+- 🧾 Print six photos on a 4x6 sheet for around **$0.30–$0.60**
+- ✂️ Cut it yourself or ask at the store
+
+**Why this is better:**
+
+- No need for professional photographer
+- No $25+ studio charge
+- No need to visit multiple locations
+
+🔗 Try: [Walmart Photo Centre](https://www.walmart.ca/en/photo-centre)
+""")
+
+
+st.info("💡 **Tip**: Use a plain white background, soft lighting, and face forward directly for optimal results.")
