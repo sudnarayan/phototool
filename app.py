@@ -22,8 +22,9 @@ if uploaded_file:
 
     resized_image = image.resize((600, 600))
 
-    with st.expander("🔍 Preview resized photo (600x600)", expanded=False):
-        st.image(resized_image, caption="(Optional Preview)", use_container_width=False, output_format="JPEG", clamp=True)
+    with st.expander("🔍 Tiny Preview of Resized Photo (600x600)", expanded=False):
+        small_preview = resized_image.resize((150, 150))  # 👈 smaller preview
+        st.image(small_preview, caption="(Preview only)", use_container_width=False, output_format="JPEG", clamp=True)
 
     if not st.session_state.paid:
         st.subheader("Download for $2.99 CAD")
@@ -51,7 +52,7 @@ if uploaded_file:
         st.success("✅ Payment verified. Ready to download!")
         buf = io.BytesIO()
         resized_image.save(buf, format="JPEG")
-        st.download_button("📥 Download Photo", data=buf.getvalue(), file_name="bls_photo.jpg", mime="image/jpeg")
+        st.download_button("📥 Download Passport Photo", data=buf.getvalue(), file_name="bls_photo.jpg", mime="image/jpeg")
 
 st.markdown("---")
 with st.form("feedback"):
