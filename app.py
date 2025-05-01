@@ -22,9 +22,6 @@ st.markdown("""
 - **Background:** Plain white without borders
 - **Clothing:** Dark colour top preferred
 - **Eyes:** Open and visible
-
-Below is an official sample reference image from BLS Canada:
-![BLS Spec Image](https://raw.githubusercontent.com/seemulooksgud/phototool/main/static/spec_photo.png)
 """, unsafe_allow_html=True)
 
 if "paid" not in st.session_state:
@@ -34,9 +31,23 @@ uploaded_file = st.file_uploader("Upload your photo", type=["jpg", "jpeg", "png"
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Photo", use_container_width=True)
-
     resized_image = image.resize((600, 600))
+
+    buf_check = io.BytesIO()
+    resized_image.save(buf_check, format="JPEG", quality=95)
+    file_size_kb = len(buf_check.getvalue()) / 1024
+    if file_size_kb > 240:
+        st.warning(f"⚠️ Warning: Original resized photo is {round(file_size_kb, 2)} KB, exceeding BLS Canada’s 240 KB max. Attempting compression...")
+        for quality in range(90, 10, -10):
+            compressed_buf = io.BytesIO()
+            resized_image.save(compressed_buf, format="JPEG", quality=quality)
+            compressed_size_kb = len(compressed_buf.getvalue()) / 1024
+            if compressed_size_kb <= 240:
+                resized_image = Image.open(io.BytesIO(compressed_buf.getvalue()))
+                st.success(f"✅ Compressed image to {round(compressed_size_kb, 2)} KB using quality={quality}.")
+                break
+        else:
+            st.warning("⚠️ Unable to compress under 240 KB even at low quality. Consider uploading a simpler image.")
 
     with st.expander("🔍 Tiny Preview of Resized Photo (600x600)", expanded=False):
         small_preview = resized_image.resize((150, 150))
@@ -72,9 +83,9 @@ if uploaded_file:
         resized_image.save(buf, format="JPEG")
         st.download_button("📥 Download Passport Photo", data=buf.getvalue(), file_name="bls_photo.jpg", mime="image/jpeg")
 
-# Feedback form and Google Sheets integration
+# Google Form feedback
 def send_feedback_to_google_form(name, feedback):
-    form_url = "https://docs.google.com/forms/d/e/1FAIpQLSfuzQAKXWhTociKZ-cS-M0XPMVj_AQuNE7EMXwv7JTrb1mJTA/formResponse"
+    form_url = "https://docs.google.com/forms/d/e/1FAIpQLScZNW0CC0bnpRT-51oi8C6RJVvuzuxpeWWaHIuk7qWM6pRC7g/formResponse"
     data = {
         "entry.1272137688": name,
         "entry.657457410": feedback
@@ -96,7 +107,6 @@ with st.form("feedback"):
 
 st.markdown("---")
 st.subheader("🧠 Pro Tips: Save Money on Printing")
-
 st.markdown("""
 **💸 Save $10+ instantly vs photo studios**
 
@@ -108,13 +118,6 @@ Here's how:
 - 🧾 Print six photos on a 4x6 sheet for around **$0.30–$0.60**
 - ✂️ Cut it yourself or ask at the store
 
-**Why this is better:**
-
-- No need for professional photographer
-- No $25+ studio charge
-- No need to visit multiple locations
-
 🔗 Try: [Walmart Photo Centre](https://www.walmart.ca/en/photo-centre)
 """)
-
 st.info("💡 **Tip**: Use a plain white background, soft lighting, and face forward directly for optimal results.")
