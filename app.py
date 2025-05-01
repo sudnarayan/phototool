@@ -1,3 +1,4 @@
+
 import os
 import streamlit as st
 from PIL import Image
@@ -9,7 +10,10 @@ import requests
 stripe.api_key = st.secrets["STRIPE_SECRET_KEY"]
 
 st.set_page_config(page_title="SnapVisa - BLS Canada Passport Photo")
-st.markdown("<h1 style='text-align: center; color: #0D47A1;'>📷 DIY OCI / Passport Photo Tool</h1><h4 style='text-align: center; color: gray;'>Resize and download photos that meet BLS Canada specs for OCI, Passport, and Visa — no studio needed.</h4>
+
+st.markdown("""
+<h1 style='text-align: center; color: #0D47A1;'>📷 DIY OCI / Passport Photo Tool</h1>
+<h4 style='text-align: center; color: gray;'>Resize and download photos that meet BLS Canada specs for OCI, Passport, and Visa — no studio needed.</h4>
 
 ---
 
@@ -21,7 +25,7 @@ st.markdown("<h1 style='text-align: center; color: #0D47A1;'>📷 DIY OCI / Pass
 
 Below is an official sample reference image from BLS Canada:
 ![BLS Spec Image](https://raw.githubusercontent.com/seemulooksgud/phototool/main/static/spec_photo.png)
-", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 if "paid" not in st.session_state:
     st.session_state.paid = False
@@ -40,7 +44,7 @@ if uploaded_file:
 
     if not st.session_state.paid:
         st.markdown("### 💳 Secure Download")
-st.markdown("Only $2.99 CAD – pay once and download instantly!")
+        st.markdown("Only $2.99 CAD – pay once and download instantly!")
         if st.button("💳 Pay with Stripe"):
             session = stripe.checkout.Session.create(
                 payment_method_types=["card"],
@@ -63,7 +67,7 @@ st.markdown("Only $2.99 CAD – pay once and download instantly!")
 
     if st.session_state.paid:
         st.markdown("### ✅ Payment Verified!")
-st.success("You can now download your resized passport photo below.")
+        st.success("You can now download your resized passport photo below.")
         buf = io.BytesIO()
         resized_image.save(buf, format="JPEG")
         st.download_button("📥 Download Passport Photo", data=buf.getvalue(), file_name="bls_photo.jpg", mime="image/jpeg")
@@ -90,7 +94,6 @@ with st.form("feedback"):
         else:
             st.warning("⚠️ Failed to submit. Try again later.")
 
-
 st.markdown("---")
 st.subheader("🧠 Pro Tips: Save Money on Printing")
 
@@ -113,6 +116,5 @@ Here's how:
 
 🔗 Try: [Walmart Photo Centre](https://www.walmart.ca/en/photo-centre)
 """)
-
 
 st.info("💡 **Tip**: Use a plain white background, soft lighting, and face forward directly for optimal results.")
