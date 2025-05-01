@@ -9,3 +9,4 @@ stripe>=12.1.0
 flask-login>=0.6.3
 flask-wtf>=1.2.2
 sendgrid>=6.11.0
+requests>=2.0.0
