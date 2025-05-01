@@ -23,8 +23,7 @@ st.markdown("""
 - **Clothing:** Dark colour top preferred
 - **Eyes:** Open and visible
 
-Below is an official sample reference image from BLS Canada:
-![BLS Spec Image](https://raw.githubusercontent.com/seemulooksgud/phototool/main/static/spec_photo.png)
+
 """, unsafe_allow_html=True)
 
 if "paid" not in st.session_state:
@@ -36,7 +35,31 @@ if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Photo", use_container_width=True)
 
-    resized_image = image.resize((600, 600))
+    
+resized_image = image.resize((600, 600))
+
+# Check file size limit
+buf_check = io.BytesIO()
+resized_image.save(buf_check, format="JPEG", quality=95)
+file_size_kb = len(buf_check.getvalue()) / 1024
+
+if file_size_kb > 240:
+    st.warning(f"⚠️ Warning: Original resized photo is {round(file_size_kb, 2)} KB, exceeding BLS Canada’s 240 KB max. Attempting compression...")
+
+    # Try compressing the image to reduce size
+    for quality in range(90, 10, -10):  # reduce quality gradually
+        compressed_buf = io.BytesIO()
+        resized_image.save(compressed_buf, format="JPEG", quality=quality)
+        compressed_size_kb = len(compressed_buf.getvalue()) / 1024
+        if compressed_size_kb <= 240:
+            resized_image = Image.open(io.BytesIO(compressed_buf.getvalue()))
+            st.success(f"✅ Compressed image to {round(compressed_size_kb, 2)} KB using quality={quality}.")
+            break
+    else:
+        st.warning("⚠️ Unable to compress under 240 KB even at low quality. Consider uploading a simpler image.")
+
+    st.warning(f"⚠️ Warning: Your resized photo is {round(file_size_kb, 2)} KB, which exceeds BLS Canada’s 240 KB max size requirement. Consider uploading a photo with lower resolution or compression.")
+
 
     with st.expander("🔍 Tiny Preview of Resized Photo (600x600)", expanded=False):
         small_preview = resized_image.resize((150, 150))
