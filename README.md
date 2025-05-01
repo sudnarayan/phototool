@@ -1,16 +1,23 @@
-# SnapVisa - Passport Photo App
+# SnapVisa DIY BLS Photo Tool
 
-This Streamlit app helps users upload, resize, preview, and purchase passport photos compatible with BLS Canada requirements.
+This app helps users generate 2x2 inch photos as per BLS Canada requirements (for OCI, Passport, etc). Features:
 
-## Features
-- Upload and auto-resize to 600x600px
-- Tiny preview to avoid misuse
-- Stripe payment integration
-- Feedback saved to Google Sheets via Google Forms
+- Resize to 600x600px
+- Stripe-powered secure download
+- Google Form feedback logger
+- Official spec guide + image
 
-## How to Run Locally
+## Setup
+
 1. Install dependencies:
-    pip install -r requirements.txt
-2. Set your Stripe keys in `.streamlit/secrets.toml` or via Streamlit Cloud secrets
+   pip install -r requirements.txt
+
+2. Add your secrets to `.streamlit/secrets.toml`:
+   ```toml
+   STRIPE_SECRET_KEY = "your_key"
+   SUCCESS_URL = "https://your-app-url/?paid=true"
+   CANCEL_URL = "https://your-app-url/"
+   ```
+
 3. Run:
-    streamlit run app.py
+   streamlit run app.py
